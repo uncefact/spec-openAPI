@@ -6,6 +6,8 @@ The OpenAPI NDR TS defines the rules for creating conformant UN/CEFACT API speci
 
 This repository serves as a test platform during the project phase. Subsequently, the final location for the publication of the UN/CEFACT standards will be specified. The generated JSON schema files will serve as standardised input for the JSON-LD project from the end of this project. In this way, conformity between these two formats will be ensured. 
 
+The [OpenAPI NDR technical specification](https://github.com/uncefact/spec-openAPI/blob/main/API-TECH-SPEC_OpenAPI_NDR_version1p0.pdf) from the public review can be found [here](https://github.com/uncefact/spec-openAPI/blob/main/API-TECH-SPEC_OpenAPI_NDR_version1p0.pdf).
+
 ## Contribution
 We invite anyone in the global supply chain space (e.g. trade, transport, finance, agriculture, travel, …) to participate and contribute. Especially we are looking for active users in API development to drive quality requirements. 
 
