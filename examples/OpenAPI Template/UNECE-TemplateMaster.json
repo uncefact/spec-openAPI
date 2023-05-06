@@ -123,6 +123,19 @@
     },
     "udt": {
       "$defs": {
+        "codeType": {
+          "title": "Code. Type",
+          "description": "A character string (letters, figures or symbols) that for brevity and/or language independence may be used to represent or replace a definitive value or text of an Attribute together with relevant supplementary information.",
+          "type": "object",
+          "properties": {
+            "content": {
+              "$ref": "#/$defs/pdt/$defs/stringType"
+            }
+          },
+          "required": [
+            "content"
+          ]
+        },
         "idType": {
           "title": "Identifier. Type",
           "description": "A character string to identify and distinguish uniquely, one instance of an object in an identification scheme from all other objects in the same scheme together with relevant supplementary information.",
@@ -161,6 +174,11 @@
     },
     "codeList": {
       "$defs": {
+        "UNTDID3207Type": {
+          "title": "ISO_ISOTwoletterCountryCode_SecondEdition2006.TXT",
+          "description": "Identification of the name of the country or other geographical entity as defined in ISO 3166-1.",
+          "type": "string"
+        },
         "untdid2379JsonType": {
           "title": "Date and Time format codes for JSON representation.",
           "description": "This code list is based on UNTDID 2379. It is adjusted to take JSON date and time representation into account.\n# The following abbreviations are used\n* 'C' – Century\n * 'Y' – Year\n * 'M' – Month\n * 'D' – Day\n * 'h' – Hour\n * 'm' – Minute\n * 's' – Second\n * 'w' – Week\n * 'T' – Time zone offset separator (+/-/Z) \n \n * 'A' – 10 day period within a month of a year\n * 'B' – 1: First half month; 2: second half month\n * 'E' – Week of a month\n * 'G' – Working days\n * 'H' – Half month\n * 'I' – 1-9: Shift in a day\n * 'K' – 1-5: First to fifth week in a month\n * 'M' – Trimester: A period of three months\n * 'N' – 1-7: Numeric representation of the day (Monday = 1, Sunday = 7)\n * 'P' – A period of 4 months\n * 'Q' – Quarter\n * 'RR' – 00-99: Time period\n * 'S' – Semester\n *\n  * Hyphens and additional character in a format string are kept. According to ISO 8601 a slash is used to separate time spans.\n # Codes from UNTDID 2379 and their representation in JSON\n * '2' – is represented as 'date' format\n * '3' – is represented as 'date' format\n * '4' – is represented as 'date' format\n * '5' – is represented as 'date-time' format\n * '6' – is represented as 'CCYY-MM-B'\n * '7' – is represented as 'CCYY-MM-K'\n * '8' – is represented as 'CCYY-MM-DD-I'\n * '9' – is represented as 'CCYY-MM-DD-RR'\n * '10' – is represented as 'date-time' format\n * '101' – is represented as 'date' format\n * '102' – is represented as 'date' format\n * '103' – is represented as 'YY-Www-N'; 01 is first week of January; 1 is always Monday\n * '104' – is represented as 'MM-WEE/MM-WEE'\n * '105' – is represented as 'YY-DDD'; January the first = Day 001; Always start numbering the days of the year from January 1st through December 31st \n * '106' – is represented as '-MM-DD'\n * '107' – is represented as 'DDD'\n  * '108' – is represented as 'WW'\n * '109' – is represented as '-MM-'\n * '110' – is represented as '--DD'\n * '201' – is represented as 'date-time' format\n * '202' – is represented as 'date-time' format\n * '203' – is represented as 'date-time' format\n * '204' – is represented as 'date-time' format\n * '205' – is represented as 'date-time' format\n * '206' – is represented as 'date-time' format\n * '207' – is represented as 'date-time' format\n * '208' – is represented as 'date-time' format\n * '209' – is represented as 'date-time' format\n * '210' – is represented as 'hh:mm:ssZhh:mm/hh:mm:ssZhh:mm'\n * '301' – is represented as 'date-time' format\n * '302' – is represented as 'date-time' format\n * '303' – is represented as 'date-time' format\n * '304' – is represented as 'date-time' format\n * '305' – is represented as '-MM-DDThh:mm' format\n * '306' – is represented as '--DDThh:mm' format\n * '307' – is represented as 'date-time' format\n * '308' – is represented as 'CCYY-MM-DDThh:mmZhh:mm/CCYY-MM-DDThh:mmZhh:mm' \n * '401' – is represented as 'time' format\n * '402' – is represented as 'time' format\n * '404' – is represented as 'time' format\n * '405' – is represented as 'duration' format\n * '406' – is represented as 'Zhh:mm'\n * '501' – is represented as 'hh:mm/hh:mm' \n  * '502' – is represented as 'hh:mm:ss/hh:mm:ss' \n  * '503' – is represented as 'hh:mm:ssZhh:mm/hh:mm:ssZhh:mm' \n  * '600' – is represented as 'CC'\n  * '601' – is represented as 'YY' \n  * '602' – is represented as 'CCYY' \n  * '603' – is represented as 'YY-S' \n  * '604' – is represented as 'CCYY-S' \n  * '608' – is represented as 'CCYY-Q' \n  * '609' – is represented as 'YY-MM' \n  * '610' – is represented as 'CCYY-MM' \n  * '613' – is represented as 'YY-MM-A' \n  * '614' – is represented as 'YY-MM-A' \n  * '615' – is represented as 'YY-Www \n  * '616' – is represented as 'CCYY-Www' \n  * '701' – is represented as 'YY/YY' \n  * '702' – is represented as 'CCYY/CCYY' \n  * '703' – is represented as 'YY-S/YY-S' \n  * '704' – is represented as 'CCYY-S/CCYY-S' \n  * '705' – is represented as 'YY-P/YY-P' \n  * '706' – is represented as 'CCYY-P/CCYY-P' \n  * '707' – is represented as 'YY-Q/YY-Q' \n  * '708' – is represented as 'CCYY-Q/CCYY-Q' \n  * '709' – is represented as 'YY-MM/YY-MM' \n  * '710' – is represented as 'CCYY-MM/CCYY-MM' \n  * '713' – is represented as 'YY-MM-DDThh:mm/YY-MM-DDThh:mm' \n  * '715' – is represented as 'YY-Www/YY-Www' \n  * '716' – is represented as 'CCYY-Www/CCYY-Www' \n  * '717' – is represented as 'YY-MM-DD/YY-MM-DD' \n  * '718' – is represented as 'CCYY-MM-DD/CCYY-MM-DD' \n  * '719' – is represented as 'CCYY-MM-DDThh:mm/CCYY-MM-DDThh:mm' \n  * '720' – is represented as 'NThh:mm/NThh:mm' \n  * '801' – is represented as 'duration' format \n  * '802' – is represented as 'duration' format \n  * '803' – is represented as 'duration' format \n  * '804' – is represented as 'duration' format \n  * '805' – is represented as 'duration' format \n  * '806' – is represented as 'duration' format \n  * '807' – is represented as 'duration' format \n  * '808' – is represented as 'S' \n  * '809' – is represented as 'P' \n  * '810' – is represented as 'M' \n  * '811' – is represented as 'H' \n  * '812' – is represented as 'A' \n  * '813' – is represented as 'N' \n  * '814' – is represented as 'G'"
@@ -169,6 +187,31 @@
     },
     "qdt": {
       "$defs": {}
+    },
+    "headerTradeAgreementType": {
+      "title": "Header_ Trade Agreement. Details",
+      "description": "The contractual terms of a header trade agreement.",
+      "type": "object",
+      "properties": {
+        "seller": {
+          "title": "Header_ Trade Agreement. Seller. Trade_ Party",
+          "description": "The seller party for this header trade agreement.",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/tradePartyType"
+            },
+            {
+              "$ref": "#/$defs/resourceType"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/extensibleType"
+        }
+      ],
+      "unevaluatedProperties": false
     },
     "consignmentItemType": {
       "title": "Supply Chain_ Consignment Item. Details",
@@ -217,7 +260,11 @@
           "description": "The consignor party for this supply chain consignment.",
           "oneOf": [
             {
-              "$ref": "#/$defs/tradePartyType"
+              "$ref": "#/$defs/tradePartyType",
+              "properties": {
+                "name": false,
+                "postalTradeAddress": false
+              }
             },
             {
               "$ref": "#/$defs/resourceType"
@@ -229,7 +276,11 @@
           "description": "The consignee party for this supply chain consignment.",
           "oneOf": [
             {
-              "$ref": "#/$defs/tradePartyType"
+              "$ref": "#/$defs/tradePartyType",
+              "properties": {
+                "name": false,
+                "postalTradeAddress": false
+              }
             },
             {
               "$ref": "#/$defs/resourceType"
@@ -292,6 +343,109 @@
       ],
       "unevaluatedProperties": false
     },
+    "tradeTransactionType": {
+      "title": "Supply Chain_ Trade Transaction. Details",
+      "description": "A group of supply chain trade line items, trade agreement, trade delivery and trade settlement details.",
+      "type": "object",
+      "properties": {
+        "applicableHeaderTradeAgreement": {
+          "title": "Supply Chain_ Trade Transaction. Applicable. Header_ Trade Agreement",
+          "description": "A trade agreement header applicable to this supply chain trade transaction, such as payment or delivery terms.",
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/headerTradeAgreementType"
+              },
+              {
+                "$ref": "#/$defs/resourceType"
+              }
+            ]
+          }
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/extensibleType"
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "tradeAddressType": {
+      "title": "Trade_ Address. Details",
+      "description": "The location at which a particular trade related organization or person may be found or reached.",
+      "type": "object",
+      "properties": {
+        "postcodeCode": {
+          "title": "Trade_ Address. Postcode. Code",
+          "description": "A code specifying the postcode of this trade address.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/udt/$defs/codeType"
+          },
+          "maxItems": 1
+        },
+        "lineOne": {
+          "title": "Trade_ Address. Line One. Text",
+          "description": "The first free form line, expressed as text, of this trade address.",
+          "$ref": "#/$defs/udt/$defs/textType"
+        },
+        "lineTwo": {
+          "title": "Trade_ Address. Line Two. Text",
+          "description": "The second free form line, expressed as text, of this trade address.",
+          "$ref": "#/$defs/udt/$defs/textType"
+        },
+        "lineThree": {
+          "title": "Trade_ Address. Line Three. Text",
+          "description": "The third free form line, expressed as text, of this trade address.",
+          "$ref": "#/$defs/udt/$defs/textType"
+        },
+        "lineFour": {
+          "title": "Trade_ Address. Line Four. Text",
+          "description": "The fourth free form line, expressed as text, of this trade address.",
+          "$ref": "#/$defs/udt/$defs/textType"
+        },
+        "lineFive": {
+          "title": "Trade_ Address. Line Five. Text",
+          "description": "The fifth free form line, expressed as text, of this trade address.",
+          "$ref": "#/$defs/udt/$defs/textType"
+        },
+        "streetName": {
+          "title": "Trade_ Address. Street Name. Text",
+          "description": "A name, expressed as text, of a street or thoroughfare for this trade address.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/udt/$defs/textType"
+          },
+          "maxItems": 1
+        },
+        "cityName": {
+          "title": "Trade_ Address. City Name. Text",
+          "description": "The name, expressed as text, of the city, town or village of this trade address.",
+          "$ref": "#/$defs/udt/$defs/textType"
+        },
+        "countryId": {
+          "title": "Trade_ Address. Country. Identifier",
+          "description": "The unique identifier of a country for this trade address.",
+          "$ref": "#/$defs/pdt/$defs/stringType"
+        },
+        "countrySubDivisionId": {
+          "title": "Trade_ Address. Country Sub-Division. Identifier",
+          "description": "A unique identifier of the country sub-division for this trade address.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/udt/$defs/idType"
+          },
+          "maxItems": 1
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/extensibleType"
+        }
+      ],
+      "unevaluatedProperties": false
+    },
     "tradePartyType": {
       "title": "Trade_ Party. Details",
       "description": "An individual, a group, or a body having a role in a trade business function.",
@@ -304,6 +458,27 @@
           "items": {
             "$ref": "#/$defs/udt/$defs/idType"
           }
+        },
+        "name": {
+          "title": "Trade_ Party. Name. Text",
+          "description": "A name, expressed as text, for this trade party.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/udt/$defs/textType"
+          },
+          "maxItems": 1
+        },
+        "postalTradeAddress": {
+          "title": "Trade_ Party. Postal. Trade_ Address",
+          "description": "The postal address for this trade party.",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/tradeAddressType"
+            },
+            {
+              "$ref": "#/$defs/resourceType"
+            }
+          ]
         }
       },
       "allOf": [
