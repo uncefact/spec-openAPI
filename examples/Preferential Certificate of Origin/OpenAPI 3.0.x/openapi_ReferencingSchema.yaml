@@ -516,7 +516,7 @@ components:
         specification:
           type: string
           description: 'A valid URI to the OpenAPI specification of the current API. This way the available services and data types become self-descriptive from their basic structure. The OpenAPI specification SHOULD be public where possible and easily accessible to those that require it.'
-          example: 'https://raw.githubusercontent.com/uncefact/spec-openAPI/main/examples/Preferential%20Certificate%20of%20Origin/OpenAPI%203.0.x/openapi.yaml'
+          example: 'https://raw.githubusercontent.com/uncefact/spec-openAPI/main/examples/Preferential%20Certificate%20of%20Origin/OpenAPI%203.0.x/openapi_ReferencingSchema.yaml'
           format: uri
       required:
         - title
@@ -612,28 +612,6 @@ components:
           description: The URL in the external app to be called if an event is risen.
           example: 'https://callback.example.com/callback/Ujh4kkQ9A'
           format: uri
-      required:
-        - subscriptionId
-        - callbackURL
-    subscriptionDetails:
-      type: object
-      description: Details of a subscription
-      properties:
-        subscriptionId:
-          type: string
-          description: A unique identifier for this specific subscription
-          example: 'e04d9665-1b99-4fad-a7be-98d5c9572d60'
-          format: uuid
-        callbackURL:
-          type: string
-          description: The URL in the external app to be called if an event is risen.
-          example: 'https://callback.example.com/callback/Ujh4kkQ9A'
-          format: uri
-        minimumDeviation:
-          type: integer
-          description: The minium deviation in minutes after which a callback is triggered
-          example: 10
-          minimum: 10
       required:
         - subscriptionId
         - callbackURL
