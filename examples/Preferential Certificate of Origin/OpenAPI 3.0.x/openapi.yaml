@@ -1,0 +1,951 @@
+openapi: 3.0.3
+info:
+  title: UN/CEFACT Peferential Certifificate of Origin Demo API
+  description: Implementation verification for the JSON Schema NDR and OpenAPI NDR technical specifications using a Preferential Certificate of Origin API.
+  contact:
+    url: 'https://unece.org/trade/uncefact/bureau'
+    email: 'support.trade@un.org'
+  license:
+    name: |
+      Intellectual Property Rights Policy
+      ECE/TRADE/C/CEFACT/2010/20/Rev.2
+    url: 'https://unece.org/DAM/cefact/cf_plenary/plenary12/ECE_TRADE_C_CEFACT_2010_20_Rev2E_UpdatedIPRpolicy.pdf'
+  version: 1.0.0
+servers:
+  - url: 'https://api.uncefact.unece.org/v1'
+    description: Template server description according to the OpenAPI NDR TS.
+paths:
+  /:
+    description: Information about the API.
+    get:
+      tags:
+        - General API handling
+      description: Get infomation about the current API.
+      operationId: readApiInformation
+      responses:
+        200:
+          description: Returns info about the current API.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/apiInfoResponse'
+        400:
+          $ref: '#/components/responses/400_WrongAPIVersionParameter'
+        401:
+          $ref: '#/components/responses/401_Unauthorized'
+        403:
+          $ref: '#/components/responses/403_Forbidden'
+        404:
+          $ref: '#/components/responses/404_APIVersionNotFound'
+        405:
+          $ref: '#/components/responses/405_NotAllowed'
+        408:
+          $ref: '#/components/responses/408_RequestTimeout'
+        415:
+          $ref: '#/components/responses/415_UnsupportedMediaType'
+        500:
+          $ref: '#/components/responses/500_InternalServerError'
+    parameters:
+      - $ref: '#/components/parameters/API-Version-Major'
+  /preferentialCertificateOfOrigin:
+    description: Handling of the Preferential CoO requests
+    post:
+      tags:
+        - Preferential Certificate of Origin
+      description: Requesting the issuance of an preferential Certificate of Origin.
+      operationId: createPreferentialCoO
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/preferentialCertificateOfOrigin'
+      responses:
+        201:
+          $ref: '#/components/responses/201_Post'
+        400:
+          $ref: '#/components/responses/400_ImporterDoesNotExist'
+        401:
+          $ref: '#/components/responses/401_Unauthorized'
+        403:
+          $ref: '#/components/responses/403_Forbidden'
+        408:
+          $ref: '#/components/responses/408_RequestTimeout'
+        415:
+          $ref: '#/components/responses/415_UnsupportedMediaType'
+        500:
+          $ref: '#/components/responses/500_InternalServerError'
+    parameters:
+      - $ref: '#/components/parameters/API-Version-Major'
+  /preferentialCertificateOfOrigin/{id}:
+    description: Handling a specific Preferential CoO
+    get:
+      tags:
+        - Preferential Certificate of Origin
+      description: Reading a specific Pref CoO.
+      operationId: readPreferentialCoO
+      responses:
+        200:
+          $ref: '#/components/responses/200_Get'
+        401:
+          $ref: '#/components/responses/401_Unauthorized'
+        403:
+          $ref: '#/components/responses/403_Forbidden'
+        404:
+          $ref: '#/components/responses/404_NotFound'
+        408:
+          $ref: '#/components/responses/408_RequestTimeout'
+        415:
+          $ref: '#/components/responses/415_UnsupportedMediaType'
+        500:
+          $ref: '#/components/responses/500_InternalServerError'
+    parameters:
+      - name: id
+        in: path
+        description: The id of the Preferential CoO.
+        required: true
+        schema:
+          type: string
+        example: 11C4403A1404/01220
+      - $ref: '#/components/parameters/API-Version-Major'
+  /preferentialCertificateOfOrigin/subscriptions:
+    description: Handling subcriptions to a notification of the processing status of Pref. CoOs.
+    post:
+      tags:
+        - Preferential Certificate of Origin
+        - Subscription handling
+      description: Subscribing to the service of issuing the Pref CoO. The issuer will call the requester back once the request was processed.
+      operationId: subscriptionPrefCoO
+      requestBody:
+        description: 'The subscriber provides the callBack-URL as well as the secret by which the security hash is calculated.'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/subscriptionRequest'
+            example:
+              callbackURL: 'https://callback.example.com/callback/Ujh4kkQ9A'
+              secret: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQzNjU3ODlhYmNkZQ
+        required: true
+      responses:
+        201:
+          description: Subscription created
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/subscriptionResponse'
+              example:
+                subscriptionId: '936DA01F-9ABD-4D9D-80C7-02AF85C822A8'
+                callbackURL: 'https://callback.example.com/callback/Ujh4kkQ9A'
+        400:
+          $ref: '#/components/responses/400_InvalidCallbackURL'
+        401:
+          $ref: '#/components/responses/401_Unauthorized'
+        403:
+          $ref: '#/components/responses/403_Forbidden'
+        408:
+          $ref: '#/components/responses/408_RequestTimeout'
+        415:
+          $ref: '#/components/responses/415_UnsupportedMediaType'
+        500:
+          $ref: '#/components/responses/500_InternalServerError'
+      callbacks:
+        setupVerification:
+          "{$request.body#/callbackURL}":
+            head:
+              tags:
+                - Subscription handling
+              description: |
+                **This callback is only listed for information purposes.**
+
+
+                This callback does not belong here in the provider's API. Instead it must be implemented by the subscriber.
+              operationId: callbackVerification
+              responses:
+                204:
+                  description: Valid callbackURL
+                  headers:
+                    API-Version:
+                      $ref: '#/components/headers/API-Version'
+                default:
+                  description: Unexpected error
+                  headers:
+                    API-Version:
+                      $ref: '#/components/headers/API-Version'
+        requestProcessedEvent:
+          "{$request.body#/callbackURL}":
+            post:
+              tags:
+                - Subscription handling
+              description: Informs the subscriber that the request of a Pref. CoO was procressed.
+              parameters:
+                - name: 'Subscription-ID'
+                  in: header
+                  description: Handing over the subscriptionID to the client.
+                  required: true
+                  schema:
+                    type: string
+                  example: '936DA01F-9ABD-4D9D-80C7-02AF85C822A8'
+                - name: 'Notification-Signature'
+                  in: header
+                  description: The SHA256 signature of the body calculated with the known secret encoded in BASE64.
+                  required: true
+                  schema:
+                    type: string
+                  example: sha256=66c2912069e6c9563d66fee4674cd23dd9dd00e6c08c985e964b11f92f477e48
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/callbackInformation'
+                    example:
+                      id: 11C4403A1404/01220
+                      typeCode: '861'
+                required: true
+              responses:
+                204:
+                  description: No Content
+                  headers:
+                    API-Version:
+                      $ref: '#/components/headers/API-Version'
+                400:
+                  $ref: '#/components/responses/400_InvalidHash'
+                401:
+                  $ref: '#/components/responses/401_Unauthorized'
+                403:
+                  $ref: '#/components/responses/403_Forbidden'
+                404:
+                  $ref: '#/components/responses/404_InvalidCallbackURL'
+                408:
+                  $ref: '#/components/responses/408_RequestTimeout'
+                415:
+                  $ref: '#/components/responses/415_UnsupportedMediaType'
+                500:
+                  $ref: '#/components/responses/500_InternalServerError'
+    get:
+      tags:
+        - Subscription handling
+      description: Get a list of active subscriptions.
+      operationId: readSubscriptions
+      parameters:
+        - $ref: '#/components/parameters/cursor'
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/sort'
+      responses:
+        200:
+          description: Returns a list of subscriptions
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+            Link:
+              $ref: '#/components/headers/Link'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/subscriptionResponse'
+              example:
+                - subscriptionId: '936DA01F-9ABD-4D9D-80C7-02AF85C822A8'
+                  callbackURL: 'https://callback.example.com/callback/Ujh4kkQ9A'
+        401:
+          $ref: '#/components/responses/401_Unauthorized'
+        403:
+          $ref: '#/components/responses/403_Forbidden'
+        404:
+          $ref: '#/components/responses/404_NotFound'
+        408:
+          $ref: '#/components/responses/408_RequestTimeout'
+        415:
+          $ref: '#/components/responses/415_UnsupportedMediaType'
+        500:
+          $ref: '#/components/responses/500_InternalServerError'
+    parameters:
+      - $ref: '#/components/parameters/API-Version-Major'
+  /preferentialCertificateOfOrigin/subscriptions/{subscriptionId}:
+    description: Handling a single subcription.
+    get:
+      tags:
+        - Subscription handling
+      description: Get details of a single subscription.
+      operationId: readSubscriptionById
+      responses:
+        200:
+          description: Returns the detail information of a subscriptions
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/subscriptionResponse'
+              example:
+                subscriptionId: '936DA01F-9ABD-4D9D-80C7-02AF85C822A8'
+                callbackURL: 'https://callback.example.com/callback/Ujh4kkQ9A'
+        401:
+          $ref: '#/components/responses/401_Unauthorized'
+        403:
+          $ref: '#/components/responses/403_Forbidden'
+        404:
+          $ref: '#/components/responses/404_NotFound'
+        408:
+          $ref: '#/components/responses/408_RequestTimeout'
+        415:
+          $ref: '#/components/responses/415_UnsupportedMediaType'
+        500:
+          $ref: '#/components/responses/500_InternalServerError'
+    put:
+      tags:
+        - Subscription handling
+      description: Updating the callbackURL and the secret of a previsously created subscription.
+      operationId: updateSubscription
+      requestBody:
+        description: 'The subscriber provides the callBack-URL as well as the secret by which the security hash is calculated.'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/subscriptionRequest'
+            example:
+              callbackURL: 'https://callback.example.com/callback/Ujh4kkQ9A'
+              secret: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQzNjU3ODlhYmNkZQ
+        required: true
+      responses:
+        204:
+          description: Update successful.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+        400:
+          $ref: '#/components/responses/400_InvalidCallbackURL'
+        401:
+          $ref: '#/components/responses/401_Unauthorized'
+        403:
+          $ref: '#/components/responses/403_Forbidden'
+        408:
+          $ref: '#/components/responses/408_RequestTimeout'
+        415:
+          $ref: '#/components/responses/415_UnsupportedMediaType'
+        500:
+          $ref: '#/components/responses/500_InternalServerError'
+      callbacks:
+        requestProcessedEvent:
+          "{$request.body#/callbackURL}":
+            post:
+              tags:
+                - Subscription handling
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/callbackInformation'
+                required: true
+              responses:
+                204:
+                  description: No Content
+                  headers:
+                    API-Version:
+                      $ref: '#/components/headers/API-Version'
+                400:
+                  $ref: '#/components/responses/400_InvalidHash'
+                401:
+                  $ref: '#/components/responses/401_Unauthorized'
+                403:
+                  $ref: '#/components/responses/403_Forbidden'
+                404:
+                  $ref: '#/components/responses/404_InvalidCallbackURL'
+                408:
+                  $ref: '#/components/responses/408_RequestTimeout'
+                415:
+                  $ref: '#/components/responses/415_UnsupportedMediaType'
+                500:
+                  $ref: '#/components/responses/500_InternalServerError'
+    delete:
+      tags:
+        - Subscription handling
+      description: Delete a specific subscription.
+      operationId: deleteSubscriptionById
+      responses:
+        204:
+          description: Successfully deleted.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+        401:
+          $ref: '#/components/responses/401_Unauthorized'
+        403:
+          $ref: '#/components/responses/403_Forbidden'
+        404:
+          $ref: '#/components/responses/404_NotFound'
+        408:
+          $ref: '#/components/responses/408_RequestTimeout'
+        415:
+          $ref: '#/components/responses/415_UnsupportedMediaType'
+        500:
+          $ref: '#/components/responses/500_InternalServerError'
+    parameters:
+      - name: subscriptionId
+        in: path
+        description: A unique ID for a subscription provided by the server.
+        required: true
+        schema:
+          type: string
+          format: uuid
+        example: '936DA01F-9ABD-4D9D-80C7-02AF85C822A8'
+      - $ref: '#/components/parameters/API-Version-Major'
+  /preferentialCertificateOfOrigin/subscriptions/{subscriptionId}/secret:
+    description: Handling a single subcription's secret.
+    put:
+      tags:
+        - Subscription handling
+      description: Updating the secret of a previsously created subscription.
+      operationId: updateSubscriptionSecret
+      requestBody:
+        description: The subscriber provides the secret by which the security hash is calculated.
+        content:
+          application/json:
+            schema:
+              type: string
+            example: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQzNjU3ODlhYmNkZQ
+        required: true
+      responses:
+        204:
+          description: Update successful.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+        400:
+          $ref: '#/components/responses/400_InvalidCallbackURL'
+        401:
+          $ref: '#/components/responses/401_Unauthorized'
+        403:
+          $ref: '#/components/responses/403_Forbidden'
+        408:
+          $ref: '#/components/responses/408_RequestTimeout'
+        415:
+          $ref: '#/components/responses/415_UnsupportedMediaType'
+        500:
+          $ref: '#/components/responses/500_InternalServerError'
+      callbacks:
+        requestProcessedEvent:
+          "{$request.body#/callbackURL}":
+            post:
+              tags:
+                - Subscription handling
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/callbackInformation'
+                required: true
+              responses:
+                204:
+                  description: No Content
+                  headers:
+                    API-Version:
+                      $ref: '#/components/headers/API-Version'
+                400:
+                  $ref: '#/components/responses/400_InvalidHash'
+                401:
+                  $ref: '#/components/responses/401_Unauthorized'
+                403:
+                  $ref: '#/components/responses/403_Forbidden'
+                404:
+                  $ref: '#/components/responses/404_InvalidCallbackURL'
+                408:
+                  $ref: '#/components/responses/408_RequestTimeout'
+                415:
+                  $ref: '#/components/responses/415_UnsupportedMediaType'
+                500:
+                  $ref: '#/components/responses/500_InternalServerError'
+    parameters:
+      - name: subscriptionId
+        in: path
+        description: A unique ID for a subscription provided by the server.
+        required: true
+        schema:
+          type: string
+          format: uuid
+        example: '936DA01F-9ABD-4D9D-80C7-02AF85C822A8'
+      - $ref: '#/components/parameters/API-Version-Major'
+components:
+  schemas:
+    apiInfoResponse:
+      type: object
+      properties:
+        title:
+          type: string
+          description: The name of the API. It SHALL be identical to the API title defined in the OpenAPI specification
+          example: UN/CEFACT Peferential Certifificate of Origin Demo API
+        version:
+          type: string
+          description: The API version.
+          example: 1.0.0
+        status:
+          type: string
+          description: |
+            The operation status of the API. The following values are used:
+
+
+
+            -   **DRAFT**: The API is still under development.
+
+            -   **ACTIVE**: The API is in its productive phase. Maintenance or deprecation of specific services SHALL be indicated at the service level. The effective defines the moment in the past since when API is in its productive phase.
+
+
+            -   **DEPRECATED**: The complete API is going to its end-of-life phase. The effective defines the moment in the future when the API is intended to switch to RETIRED. The rules of deprecation are applied additionally.
+
+
+            - **RETIRED**: The complete API is to its end-of-life phase. The effective defines the moment in the past when the API was set to RETIRED. The rules of deprecation are applied additionally.
+          example: ACTIVE
+          enum:
+            - ACTIVE  # API is in its productive phase.
+            - DEPRECATED  # The complete API is going to its end-of-life phase.
+            - DRAFT  # API still under development.
+            - RETIRED  # The complete API is to its end-of-life phase and cannot be used any more.
+        effective:
+          type: string
+          description: The moment in time corresponding to the **status**.
+          example: '2023-05-01T00:00:00Z'
+          format: 'date-time'
+        specification:
+          type: string
+          description: 'A valid URI to the OpenAPI specification of the current API. This way the available services and data types become self-descriptive from their basic structure. The OpenAPI specification SHOULD be public where possible and easily accessible to those that require it.'
+          example: 'https://raw.githubusercontent.com/uncefact/spec-openAPI/main/examples/Preferential%20Certificate%20of%20Origin/OpenAPI%203.0.x/openapi.yaml'
+          format: uri
+      required:
+        - title
+        - version
+        - status
+        - effective
+        - specification
+    errorResponse:
+      type: object
+      properties:
+        errors:
+          type: array
+          description: A list of thrown errors.
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Identifier of the specific error
+                example: '86032cbe-a804-4c3b-86ce-ec3041e3effc'
+                format: uuid
+              code:
+                type: string
+                description: 'An application-specific error code'
+                example: 19283
+              detail:
+                type: string
+                description: 'A human-readable explanation specific to this occurrence of the problem.'
+                example: Invalid value(s) in request input
+              source:
+                type: object
+                description: An object containing computer processable information about the origin of the error.
+                properties:
+                  parameter:
+                    type: string
+                    description: The (query) parameter where the error was caused.
+                    example: ident
+                  pointer:
+                    type: string
+                    description: |
+                      JSON Pointer [RFC6901] to the associated entity in the request document.
+
+                      e.g. "/data" for a primary data object, 
+
+                      or "/data/attributes/title" for a specific attribute
+                    example: '#/businessProcesses/12345'
+                    format: 'json-pointer'
+            required:
+              - code
+              - detail
+          minItems: 1
+      required:
+        - errors
+    preferentialCertificateOfOrigin:
+      $ref: 'https://raw.githubusercontent.com/uncefact/spec-JSONschema/main/compatibility/snapshot/BuyShipPay/D22B/Regulatory/BSP%20eCert/Pref%20CoO/UNECE-PreferentialCoO.json'
+    subscriptionRequest:
+      type: object
+      description: |
+        Request body for adding a subscription from external callers.
+
+        Additional properties could be added.
+      properties:
+        callbackURL:
+          type: string
+          description: The URL in the external app to be called if an event is risen.
+          example: 'https://callback.example.com/callback/Ujh4kkQ9A'
+          format: uri
+        secret:
+          type: string
+          description: |
+            The secret BASE64-encoded defined by the caller that is used to identify future callback-calls. 
+
+            The secret is used to sign the content of the callback. A signature is computed and added as a *Notification-Signature Header*.
+          example: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQzNjU3ODlhYmNkZQ
+          format: byte
+      required:
+        - callbackURL
+        - secret
+    subscriptionResponse:
+      type: object
+      description: |
+        Response from the publisher (this API) on the subscription request.
+
+        Additional content may be added.
+      properties:
+        subscriptionId:
+          type: string
+          description: A unique identifier for this specific subscription
+          example: 'e04d9665-1b99-4fad-a7be-98d5c9572d60'
+          format: uuid
+        callbackURL:
+          type: string
+          description: The URL in the external app to be called if an event is risen.
+          example: 'https://callback.example.com/callback/Ujh4kkQ9A'
+          format: uri
+      required:
+        - subscriptionId
+        - callbackURL
+    subscriptionDetails:
+      type: object
+      description: Details of a subscription
+      properties:
+        subscriptionId:
+          type: string
+          description: A unique identifier for this specific subscription
+          example: 'e04d9665-1b99-4fad-a7be-98d5c9572d60'
+          format: uuid
+        callbackURL:
+          type: string
+          description: The URL in the external app to be called if an event is risen.
+          example: 'https://callback.example.com/callback/Ujh4kkQ9A'
+          format: uri
+        minimumDeviation:
+          type: integer
+          description: The minium deviation in minutes after which a callback is triggered
+          example: 10
+          minimum: 10
+      required:
+        - subscriptionId
+        - callbackURL
+    callbackInformation:
+      type: string
+  responses:
+    200_Get:
+      description: Read a specific Pref CoO
+      headers:
+        API-Version:
+          $ref: '#/components/headers/API-Version'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/preferentialCertificateOfOrigin'
+    201_Post:
+      description: The request for a Pref CoO is accepted and the CoO Id is sent back as a response.
+      headers:
+        API-Version:
+          $ref: '#/components/headers/API-Version'
+        Location:
+          $ref: '#/components/headers/Location'
+      content:
+        application/json:
+          schema:
+            type: string
+          example: 11C4403A1404/01220
+    400_ImporterDoesNotExist:
+      description: Example for an invalid importer
+      headers:
+        API-Version:
+          $ref: '#/components/headers/API-Version'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            errors:
+              - code: '400E1'
+                detail: The ID of the importer is unknown.
+    400_InvalidCallbackURL:
+      description: Example for an invalid callback URL
+      headers:
+        API-Version:
+          $ref: '#/components/headers/API-Version'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            errors:
+              - code: '400E2'
+                detail: 'The callback-URL is invalid.'
+    400_InvalidHash:
+      description: Example for an invalid content
+      headers:
+        API-Version:
+          $ref: '#/components/headers/API-Version'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            errors:
+              - code: '400E3'
+                detail: The hash does not match the content message provided.
+    400_WrongAPIVersionParameter:
+      description: 'The value for the requested API-Version is wrong.'
+      headers:
+        API-Version:
+          $ref: '#/components/headers/API-Version'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            errors:
+              - id: '86032cbe-a804-4c3b-86ce-ec3041e3effc'
+                code: '400E4'
+                detail: 'The value for the requested API-Version is wrong. Only the major version can be provided.'
+                source:
+                  parameter: 'API-Version'
+    401_Unauthorized:
+      description: Example for an invalid requester
+      headers:
+        API-Version:
+          $ref: '#/components/headers/API-Version'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            errors:
+              - code: '401E1'
+                detail: Your application for this API is still pending.
+    403_Forbidden:
+      description: Example for a forbidden access
+      headers:
+        API-Version:
+          $ref: '#/components/headers/API-Version'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            errors:
+              - code: '403E1'
+                detail: You are not allowed to perform this operation.
+    404_InvalidCallbackURL:
+      description: Example for an invalid callback URL
+      headers:
+        API-Version:
+          $ref: '#/components/headers/API-Version'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            errors:
+              - code: '404E2'
+                detail: 'The callback-URL is invalid.'
+    404_NotFound:
+      description: Example for a not existing Pref. CoO
+      headers:
+        API-Version:
+          $ref: '#/components/headers/API-Version'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            errors:
+              - code: '404E1'
+                detail: The Pref CoO you requested does not exist.
+    404_APIVersionNotFound:
+      description: Example for a invalid identifier
+      headers:
+        API-Version:
+          $ref: '#/components/headers/API-Version'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            errors:
+              - code: '404E1'
+                detail: 'The API-Version you requested is not supported. Please have a look at the response header for the current API-Version.'
+    405_NotAllowed:
+      description: Example for an not allowed request.
+      headers:
+        API-Version:
+          $ref: '#/components/headers/API-Version'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            errors:
+              - id: '86032cbe-a804-4c3b-86ce-ec3041e3effc'
+                code: '405E1'
+                detail: Your are not allowed to perform this operation.
+    408_RequestTimeout:
+      description: Example for a request timeout
+      headers:
+        Retry-After:
+          $ref: '#/components/headers/Retry-After'
+        API-Version:
+          $ref: '#/components/headers/API-Version'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            errors:
+              - code: '408E1'
+                detail: Please try again later.
+    415_UnsupportedMediaType:
+      description: Example for an unsupported media type.
+      headers:
+        API-Version:
+          $ref: '#/components/headers/API-Version'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            errors:
+              - code: '415E1'
+                detail: The media type you provided is not supported. Please use application/json instead.
+    500_InternalServerError:
+      description: Example for an internal server error.
+      headers:
+        API-Version:
+          $ref: '#/components/headers/API-Version'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            errors:
+              - code: '500E1'
+                detail: An error occurred. Please contact the support team.
+  parameters:
+    API-Version-Major:
+      name: 'API-Version'
+      in: header
+      description: |
+        An API-Version custom header MAY be added to a request. If added, it SHALL only contain the MAJOR version. 
+        API-Version header SHALL be aligned with the URI version.
+      schema:
+        type: string
+      example: 1
+    cursor:
+      name: cursor
+      in: query
+      description: |
+        The cursor parameter is used for pagination.
+
+        The cursor-value is a string, created by the server using whatever method it likes. It identifies a point in a list of results for a query containing filters and sorting parameters for a specific moment in time. Therefore, it divides the list into those that fall before the cursor and those that fall after the cursor. There may optionally be one result that falls "on" the cursor.
+      schema:
+        type: string
+      example: SDFoisdf34Sdfsdf==sdfsndfka
+    pageSize:
+      name: pageSize
+      in: query
+      description: Overrides the default page size defined by the server / specification. The default page size is 100
+      schema:
+        type: integer
+        maximum: 100
+      example: 50
+    sort:
+      name: sort
+      in: query
+      description: 'A comma-separated list of field names to define the sort order. Field names should be suffixed by a (:) followed by either the keyword ASC (for ascending order) or DESC (for descening order) to specify direction. <b>:ASC</b> may be omitted, in which case ascending order will be used.'
+      schema:
+        type: string
+      example: 'callbackURL:DESC'
+    Notification-Signature:
+      name: 'Notification-Signature'
+      in: header
+      description: The SHA256 signature of the body calculated with the known secret encoded in BASE64.
+      required: true
+      schema:
+        type: string
+        description: The hash of the content
+        example: sha256=66c2912069e6c9563d66fee4674cd23dd9dd00e6c08c985e964b11f92f477e48
+      example: sha256=66c2912069e6c9563d66fee4674cd23dd9dd00e6c08c985e964b11f92f477e48
+    Subscription-ID:
+      name: 'Subscription-ID'
+      in: header
+      description: The unique identifier of the subscription for which this call is performed.
+      required: true
+      schema:
+        type: string
+        description: The UUID of the subscription.
+        example: 'e04d9665-1b99-4fad-a7be-98d5c9572d60'
+        format: uuid
+      example: 'e04d9665-1b99-4fad-a7be-98d5c9572d60'
+  headers:
+    Link:
+      description: A header providing URLs for the current, first, next, and last pages for this resource resultset.
+      schema:
+        type: string
+      example: '<https://api.uncefact.unece.org/v1/.../?cursor=XXX>; rel="current", <https://api.uncefact.unece.org/v1/.../?cursor=YYY>; rel="first", <https://api.uncefact.unece.org/v1/.../?cursor=ZZZ>; rel="next", <https://api.uncefact.unece.org/v1/.../?cursor=LLL>; rel="last"'
+    Retry-After:
+      description: The point in time or delay in seconds when the request should be done again.
+      schema:
+        type: integer
+      example:
+        Retry-After: 10
+    Location:
+      description: Location of a specific resource
+      required: true
+      schema:
+        type: string
+      example: 'https://api.uncefact.unece.org/v1/businessService/11C4403A1404%2F01220'
+    API-Version:
+      description: Providing the current version of the implemented API in SemVer.
+      required: true
+      schema:
+        type: string
+      example: 1.0.0
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    BearerAuth:
+      type: http
+      scheme: bearer
+    ApiKeyAuth:
+      type: apiKey
+      name: 'X-API-Key'
+      in: header
+    OpenID:
+      type: openIdConnect
+      openIdConnectUrl: 'https://example.uncefact.unece.org/.well-known/openid-configuration'
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://example.uncefact.unece.org/oauth/authorize'
+          tokenUrl: 'https://example.uncefact.unece.org/oauth/token'
+          scopes:
+            read: Grants read access
+            write: Grants write access
+            admin: Grants access to admin operations
+security:
+  - BasicAuth: []
+tags:
+  - name: General API handling
+    description: General API handling services.
+  - name: Preferential Certificate of Origin
+    description: Requesting, issuing, and rejection of preferential certificates of origin requests.
+  - name: Subscription handling
+    description: Handling of subscriptions for a request of a Pref. CoO.
