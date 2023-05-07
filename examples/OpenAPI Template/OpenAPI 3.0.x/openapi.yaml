@@ -136,6 +136,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/subscriptionResponse'
+        400:
+          description: Bad Request
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+              example:
+                errors:
+                  - id: '86032cbe-a804-4c3b-86ce-ec3041e3effc'
+                    code: 400ES1
+                    detail: The provided callbackURL is unreachable.
+        401:
+          $ref: '#/components/responses/401_Unauthorized'
+        403:
+          $ref: '#/components/responses/403_Forbidden'
+        404:
+          $ref: '#/components/responses/404_APIVersionNotFound'
+        408:
+          $ref: '#/components/responses/408_RequestTimeout'
+        415:
+          $ref: '#/components/responses/415_UnsupportedMediaType'
+        500:
+          $ref: '#/components/responses/500_InternalServerError'
       callbacks:
         setupVerification:
           "{$request.body#/callbackURL}":
@@ -180,6 +206,32 @@ paths:
                   headers:
                     API-Version:
                       $ref: '#/components/headers/API-Version'
+                400:
+                  description: Bad Request
+                  headers:
+                    API-Version:
+                      $ref: '#/components/headers/API-Version'
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/errorResponse'
+                      example:
+                        errors:
+                          - id: '86032cbe-a804-4c3b-86ce-ec3041e3effc'
+                            code: 400ES2
+                            detail: The provided callbackURL is not valid.
+                401:
+                  $ref: '#/components/responses/401_Unauthorized'
+                403:
+                  $ref: '#/components/responses/403_Forbidden'
+                404:
+                  $ref: '#/components/responses/404_APIVersionNotFound'
+                408:
+                  $ref: '#/components/responses/408_RequestTimeout'
+                415:
+                  $ref: '#/components/responses/415_UnsupportedMediaType'
+                500:
+                  $ref: '#/components/responses/500_InternalServerError'
     get:
       tags:
         - Subscription handling
@@ -274,38 +326,24 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
-      callbacks:
-        requestProcessedEvent:
-          "{$request.body#/callbackURL}":
-            post:
-              tags:
-                - Subscription handling
-              requestBody:
-                content:
-                  application/json:
-                    schema:
-                      $ref: '#/components/schemas/callbackInformation'
-                required: true
-              responses:
-                204:
-                  description: No Content
-                  headers:
-                    API-Version:
-                      $ref: '#/components/headers/API-Version'
-                400:
-                  $ref: '#/components/responses/400_InvalidHash'
-                401:
-                  $ref: '#/components/responses/401_Unauthorized'
-                403:
-                  $ref: '#/components/responses/403_Forbidden'
-                404:
-                  $ref: '#/components/responses/404_InvalidCallbackURL'
-                408:
-                  $ref: '#/components/responses/408_RequestTimeout'
-                415:
-                  $ref: '#/components/responses/415_UnsupportedMediaType'
-                500:
-                  $ref: '#/components/responses/500_InternalServerError'
+        400:
+          $ref: '#/components/responses/400_WrongRequestFormat'
+        401:
+          $ref: '#/components/responses/401_Unauthorized'
+        403:
+          $ref: '#/components/responses/403_Forbidden'
+        404:
+          $ref: '#/components/responses/404_SubscriptionNotFound'
+        405:
+          $ref: '#/components/responses/405_NotAllowed'
+        408:
+          $ref: '#/components/responses/408_RequestTimeout'
+        415:
+          $ref: '#/components/responses/415_UnsupportedMediaType'
+        422:
+          $ref: '#/components/responses/422_Unprocessable_Entity'
+        500:
+          $ref: '#/components/responses/500_InternalServerError'
     delete:
       tags:
         - Subscription handling
@@ -313,10 +351,23 @@ paths:
       operationId: deleteSubscriptionByIdent
       responses:
         204:
-          description: Successfully deleted.
-          headers:
-            API-Version:
-              $ref: '#/components/headers/API-Version'
+          $ref: '#/components/responses/400_WrongAPIVersionParameter'
+        401:
+          $ref: '#/components/responses/401_Unauthorized'
+        403:
+          $ref: '#/components/responses/403_Forbidden'
+        404:
+          $ref: '#/components/responses/404_SubscriptionNotFound'
+        405:
+          $ref: '#/components/responses/405_NotAllowed'
+        408:
+          $ref: '#/components/responses/408_RequestTimeout'
+        415:
+          $ref: '#/components/responses/415_UnsupportedMediaType'
+        422:
+          $ref: '#/components/responses/422_Unprocessable_Entity'
+        500:
+          $ref: '#/components/responses/500_InternalServerError'
     parameters:
       - name: subscriptionIdent
         in: path
@@ -348,6 +399,24 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+        400:
+          $ref: '#/components/responses/400_WrongRequestFormat'
+        401:
+          $ref: '#/components/responses/401_Unauthorized'
+        403:
+          $ref: '#/components/responses/403_Forbidden'
+        404:
+          $ref: '#/components/responses/404_SubscriptionNotFound'
+        405:
+          $ref: '#/components/responses/405_NotAllowed'
+        408:
+          $ref: '#/components/responses/408_RequestTimeout'
+        415:
+          $ref: '#/components/responses/415_UnsupportedMediaType'
+        422:
+          $ref: '#/components/responses/422_Unprocessable_Entity'
+        500:
+          $ref: '#/components/responses/500_InternalServerError'
     parameters:
       - name: subscriptionIdent
         in: path
@@ -523,7 +592,7 @@ components:
         specification:
           type: string
           description: 'A valid URI to the OpenAPI specification of the current API. This way the available services and data types become self-descriptive from their basic structure. The OpenAPI specification SHOULD be public where possible and easily accessible to those that require it.'
-          example: 'https://raw.githubusercontent.com/uncefact/spec-openAPI/main/examples/OpenAPI%20Template/openapi.yaml'
+          example: 'https://raw.githubusercontent.com/uncefact/spec-openAPI/main/examples/OpenAPI%20Template/OpenAPI%203.0.x/openapi.yaml'
           format: uri
       required:
         - title
@@ -703,6 +772,22 @@ components:
                 detail: The provided parameter is no valid UUID.
                 source:
                   parameter: ident
+    400_WrongRequestFormat:
+      description: Example for invalid request body format.
+      headers:
+        API-Version:
+          $ref: '#/components/headers/API-Version'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            errors:
+              - id: '86032cbe-a804-4c3b-86ce-ec3041e3effc'
+                code: '400E3'
+                detail: The provided callbackURL is no valid URL.
+                source:
+                  pointer: callbackURL
     401_Unauthorized:
       description: Example for an unauthorised request.
       headers:
@@ -837,6 +922,19 @@ components:
             errors:
               - code: '415E1'
                 detail: The media type you provided or requested is not supported. Please use application/json instead.
+    422_Unprocessable_Entity:
+      description: Example for an unprocessable entity.
+      headers:
+        API-Version:
+          $ref: '#/components/headers/API-Version'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            errors:
+              - code: '422E1'
+                detail: The subscription could not be updated. Please contact our support team.
     500_InternalServerError:
       description: Example for an internal server error.
       headers:
