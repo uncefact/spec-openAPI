@@ -1,0 +1,387 @@
+openapi: 3.0.3
+info:
+  title: UN/CEFACT OpenAPI 3.0.3 Minimum Template including basic schemas
+  description: Empty template based on the OpenAPI NDR and JSON Schema NDR technical specifications
+  contact:
+    url: 'https://unece.org/trade/uncefact/bureau'
+    email: 'support.trade@un.org'
+  license:
+    name: |
+      Intellectual Property Rights Policy
+      ECE/TRADE/C/CEFACT/2010/20/Rev.2
+    url: 'https://unece.org/DAM/cefact/cf_plenary/plenary12/ECE_TRADE_C_CEFACT_2010_20_Rev2E_UpdatedIPRpolicy.pdf'
+  version: 1.0.0
+servers:
+  - url: 'https://api.uncefact.unece.org/v1'
+    description: Template server description according to the OpenAPI NDR TS.
+paths:
+  /:
+    description: Information about the API.
+    get:
+      tags:
+        - General API handling
+      description: Get infomation about the current API.
+      operationId: readApiInformation
+      responses:
+        200:
+          description: Returns info about the current API.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/apiInfoResponse'
+        400:
+          $ref: '#/components/responses/400_WrongAPIVersionParameter'
+        401:
+          $ref: '#/components/responses/401_Unauthorized'
+        403:
+          $ref: '#/components/responses/403_Forbidden'
+        404:
+          $ref: '#/components/responses/404_APIVersionNotFound'
+        405:
+          $ref: '#/components/responses/405_NotAllowed'
+        408:
+          $ref: '#/components/responses/408_RequestTimeout'
+        415:
+          $ref: '#/components/responses/415_UnsupportedMediaType'
+        500:
+          $ref: '#/components/responses/500_InternalServerError'
+    parameters:
+      - $ref: '#/components/parameters/API-Version-Major'
+components:
+  schemas:
+    apiInfoResponse:
+      type: object
+      properties:
+        title:
+          type: string
+          description: The name of the API. It SHALL be identical to the API title defined in the OpenAPI specification
+          example: UN/CEFACT OpenAPI 3.0.3 Minimum Template including basic schemas
+        version:
+          type: string
+          description: The API version.
+          example: 1.0.0
+        status:
+          type: string
+          description: |
+            The operation status of the API. The following values are used:
+
+
+
+            -   **DRAFT**: The API is still under development.
+
+            -   **ACTIVE**: The API is in its productive phase. Maintenance or deprecation of specific services SHALL be indicated at the service level. The effective defines the moment in the past since when API is in its productive phase.
+
+
+            -   **DEPRECATED**: The complete API is going to its end-of-life phase. The effective defines the moment in the future when the API is intended to switch to RETIRED. The rules of deprecation are applied additionally.
+
+
+            - **RETIRED**: The complete API is to its end-of-life phase. The effective defines the moment in the past when the API was set to RETIRED. The rules of deprecation are applied additionally.
+          example: ACTIVE
+          enum:
+            - ACTIVE  # API is in its productive phase.
+            - DEPRECATED  # The complete API is going to its end-of-life phase.
+            - DRAFT  # API still under development.
+            - RETIRED  # The complete API is to its end-of-life phase and cannot be used any more.
+        effective:
+          type: string
+          description: The moment in time corresponding to the **status**.
+          example: '2023-05-01T00:00:00Z'
+          format: 'date-time'
+        specification:
+          type: string
+          description: 'A valid URI to the OpenAPI specification of the current API. This way the available services and data types become self-descriptive from their basic structure. The OpenAPI specification SHOULD be public where possible and easily accessible to those that require it.'
+          example: 'https://raw.githubusercontent.com/uncefact/spec-openAPI/main/examples/OpenAPI%20Template/OpenAPI%203.0.x/openapi_minimum.yaml'
+          format: uri
+      required:
+        - title
+        - version
+        - status
+        - effective
+        - specification
+    errorResponse:
+      type: object
+      properties:
+        errors:
+          type: array
+          description: A list of thrown errors.
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Identifier of the specific error
+                example: '86032cbe-a804-4c3b-86ce-ec3041e3effc'
+                format: uuid
+              code:
+                type: string
+                description: 'An application-specific error code'
+                example: 19283
+              detail:
+                type: string
+                description: 'A human-readable explanation specific to this occurrence of the problem.'
+                example: Invalid value(s) in request input
+              source:
+                type: object
+                description: An object containing computer processable information about the origin of the error.
+                properties:
+                  parameter:
+                    type: string
+                    description: The (query) parameter where the error was caused.
+                    example: ident
+                  pointer:
+                    type: string
+                    description: |
+                      JSON Pointer [RFC6901] to the associated entity in the request document.
+
+                      e.g. "/data" for a primary data object, 
+
+                      or "/data/attributes/title" for a specific attribute
+                    example: '#/businessProcesses/12345'
+                    format: 'json-pointer'
+            required:
+              - code
+              - detail
+          minItems: 1
+      required:
+        - errors
+  responses:
+    400_WrongAPIVersionParameter:
+      description: 'The value for the requested API-Version is wrong.'
+      headers:
+        API-Version:
+          $ref: '#/components/headers/API-Version'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            errors:
+              - id: '86032cbe-a804-4c3b-86ce-ec3041e3effc'
+                code: '400E1'
+                detail: 'The value for the requested API-Version is wrong. Only the major version can be provided.'
+                source:
+                  parameter: 'API-Version'
+    401_Unauthorized:
+      description: Example for an unauthorised request.
+      headers:
+        API-Version:
+          $ref: '#/components/headers/API-Version'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            errors:
+              - id: '86032cbe-a804-4c3b-86ce-ec3041e3effc'
+                code: '401E1'
+                detail: Your application for this service is still pending.
+    403_Forbidden:
+      description: Example for a forbidden access
+      headers:
+        API-Version:
+          $ref: '#/components/headers/API-Version'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            errors:
+              - code: '403E1'
+                detail: You are not allowed to perform this operation.
+    404_APIVersionNotFound:
+      description: Example for a invalid identifier
+      headers:
+        API-Version:
+          $ref: '#/components/headers/API-Version'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            errors:
+              - code: '404E1'
+                detail: 'The API-Version you requested is not supported. Please have a look at the response header for the current API-Version.'
+    405_NotAllowed:
+      description: Example for an not allowed request.
+      headers:
+        API-Version:
+          $ref: '#/components/headers/API-Version'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            errors:
+              - id: '86032cbe-a804-4c3b-86ce-ec3041e3effc'
+                code: '405E1'
+                detail: Your are not allowed to perform this operation.
+    408_RequestTimeout:
+      description: Example for a request timeout
+      headers:
+        Retry-After:
+          $ref: '#/components/headers/Retry-After'
+        API-Version:
+          $ref: '#/components/headers/API-Version'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            errors:
+              - code: '408E1'
+                detail: 'Please try again later (See header for retry-information).'
+    415_UnsupportedMediaType:
+      description: Example for an unsupported media type.
+      headers:
+        API-Version:
+          $ref: '#/components/headers/API-Version'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            errors:
+              - code: '415E1'
+                detail: The media type you provided or requested is not supported. Please use application/json instead.
+    422_Unprocessable_Entity:
+      description: Example for an unprocessable entity.
+      headers:
+        API-Version:
+          $ref: '#/components/headers/API-Version'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            errors:
+              - code: '422E1'
+                detail: The subscription could not be updated. Please contact our support team.
+    500_InternalServerError:
+      description: Example for an internal server error.
+      headers:
+        API-Version:
+          $ref: '#/components/headers/API-Version'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          example:
+            errors:
+              - code: '500E1'
+                detail: An error occurred. Please contact the support team.
+  parameters:
+    API-Version-Major:
+      name: 'API-Version'
+      in: header
+      description: |
+        An API-Version custom header MAY be added to a request. If added, it SHALL only contain the MAJOR version. 
+        API-Version header SHALL be aligned with the URI version.
+      schema:
+        type: string
+      example: 1
+    cursor:
+      name: cursor
+      in: query
+      description: |
+        The cursor parameter is used for pagination.
+
+        The cursor-value is a string, created by the server using whatever method it likes. It identifies a point in a list of results for a query containing filters and sorting parameters for a specific moment in time. Therefore, it divides the list into those that fall before the cursor and those that fall after the cursor. There may optionally be one result that falls "on" the cursor.
+      schema:
+        type: string
+      example: SDFoisdf34Sdfsdf==sdfsndfka
+    pageSize:
+      name: pageSize
+      in: query
+      description: Overrides the default page size defined by the server / specification. The default page size is 100
+      schema:
+        type: integer
+        maximum: 100
+      example: 50
+    sort:
+      name: sort
+      in: query
+      description: 'A comma-separated list of field names to define the sort order. Field names should be suffixed by a (:) followed by either the keyword ASC (for ascending order) or DESC (for descening order) to specify direction. <b>:ASC</b> may be omitted, in which case ascending order will be used.'
+      schema:
+        type: string
+      example: 'callbackURL:DESC'
+    Notification-Signature:
+      name: 'Notification-Signature'
+      in: header
+      description: The SHA256 signature of the body calculated with the known secret encoded in BASE64.
+      required: true
+      schema:
+        type: string
+        description: The hash of the content
+        example: sha256=66c2912069e6c9563d66fee4674cd23dd9dd00e6c08c985e964b11f92f477e48
+      example: sha256=66c2912069e6c9563d66fee4674cd23dd9dd00e6c08c985e964b11f92f477e48
+    Subscription-ID:
+      name: 'Subscription-ID'
+      in: header
+      description: The unique identifier of the subscription for which this call is performed.
+      required: true
+      schema:
+        type: string
+        description: The UUID of the subscription.
+        example: 'e04d9665-1b99-4fad-a7be-98d5c9572d60'
+        format: uuid
+      example: 'e04d9665-1b99-4fad-a7be-98d5c9572d60'
+  headers:
+    Link:
+      description: A header providing URLs for the current, first, next, and last pages for this resource resultset.
+      schema:
+        type: string
+      example: '<https://api.uncefact.unece.org/v1/.../?cursor=XXX>; rel="current", <https://api.uncefact.unece.org/v1/.../?cursor=YYY>; rel="first", <https://api.uncefact.unece.org/v1/.../?cursor=ZZZ>; rel="next", <https://api.uncefact.unece.org/v1/.../?cursor=LLL>; rel="last"'
+    Retry-After:
+      description: The point in time or delay in seconds when the request should be done again.
+      schema:
+        type: integer
+      example:
+        Retry-After: 10
+    Location:
+      description: Location of a specific resource
+      required: true
+      schema:
+        type: string
+      example: 'https://api.uncefact.unece.org/v1/businessService/11C4403A1404%2F01220'
+    API-Version:
+      description: Providing the current version of the implemented API in SemVer.
+      required: true
+      schema:
+        type: string
+      example: 1.0.0
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    BearerAuth:
+      type: http
+      scheme: bearer
+    ApiKeyAuth:
+      type: apiKey
+      name: 'X-API-Key'
+      in: header
+    OpenID:
+      type: openIdConnect
+      openIdConnectUrl: 'https://example.uncefact.unece.org/.well-known/openid-configuration'
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://example.uncefact.unece.org/oauth/authorize'
+          tokenUrl: 'https://example.uncefact.unece.org/oauth/token'
+          scopes:
+            read: Grants read access
+            write: Grants write access
+            admin: Grants access to admin operations
+security:
+  - BasicAuth: []
+tags:
+  - name: General API handling
+    description: General API handling services.
+  - name: Business Process
+    description: All operations regarding the main purpose of this API specification.
+  - name: Subscription handling
+    description: Handling of subscriptions for a request of a Pref. CoO.
